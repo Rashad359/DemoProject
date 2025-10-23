@@ -197,8 +197,7 @@ extension FavoritesViewController: UICollectionViewDelegate {
                     species: profileData.profileSpecies,
                     type: profileData.type,
                     origin: profileData.origin,
-                    isBookmarked: profileData.isBookmarked,
-                    index: indexPath.row
+                    isBookmarked: profileData.isBookmarked
                 )
             )
         default:

@@ -8,5 +8,5 @@
 import UIKit
 
 protocol APISession {
-    func fetchData(completion: @escaping(Result<NetworkModel, Error>) -> Void)
+    func fetchData(pageNumber: Int, completion: @escaping(Result<NetworkModel, Error>) -> Void)
 }

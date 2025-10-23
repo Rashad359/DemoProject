@@ -41,4 +41,8 @@ final class UserDefaultsManager {
         }
         return []
     }
+    
+    func deleteState() {
+        userdefaults.removeObject(forKey: currentKey)
+    }
 }

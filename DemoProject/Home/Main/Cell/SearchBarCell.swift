@@ -56,7 +56,6 @@ final class SearchBarCell: BaseCollectionViewCell {
         
         searchTextField.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(23)
-//            make.edges.equalToSuperview()
             make.verticalEdges.equalToSuperview()
             make.trailing.equalToSuperview()
             make.height.equalTo(48)

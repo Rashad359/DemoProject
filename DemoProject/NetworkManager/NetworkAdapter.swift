@@ -9,8 +9,8 @@ import UIKit
 
 final class NetworkAdapter: APISession {
     
-    func fetchData(completion: @escaping(Result<NetworkModel, Error>) -> Void) {
-        let url = URL(string: "https://rickandmortyapi.com/api/character/?page=1")!
+    func fetchData(pageNumber: Int, completion: @escaping(Result<NetworkModel, Error>) -> Void) {
+        let url = URL(string: "https://rickandmortyapi.com/api/character/?page=\(pageNumber)")!
         var request = URLRequest(url: url)
         request.httpMethod = HTTPMethod.get.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

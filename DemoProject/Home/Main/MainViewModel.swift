@@ -10,6 +10,7 @@ import UIKit
 protocol MainViewDelegate: AnyObject {
     func error(_ error: Error)
     func didFetchData(with data: [ProfileCollectionCell.Item])
+    func didUpdateData(with data: [ProfileCollectionCell.Item])
     func bookmarked()
 }
 
@@ -44,14 +45,34 @@ final class MainViewModel {
         return userdefaults.getState()
     }
     
-    func printData() {
-        networkManager.fetchData { [weak self] result in
+    func deleteList() {
+        userdefaults.deleteState()
+    }
+    
+    func printData(page: Int) {
+        networkManager.fetchData(pageNumber: page) { [weak self] result in
             switch result {
             case .success(let data):
                 
                 guard let cellData = self?.mapDataToProfile(data) else { return }
                 
                 self?.delegate?.didFetchData(with: cellData)
+                
+            case .failure(let error):
+                
+                self?.delegate?.error(error)
+            }
+        }
+    }
+    
+    func appendData(with page: Int) {
+        networkManager.fetchData(pageNumber: page) { [weak self] result in
+            switch result {
+            case .success(let data):
+                
+                guard let cellData = self?.mapDataToProfile(data) else { return }
+                
+                self?.delegate?.didUpdateData(with: cellData)
                 
             case .failure(let error):
                 

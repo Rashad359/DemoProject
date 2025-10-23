@@ -219,6 +219,7 @@ final class DetailsViewController: BaseViewController {
             make.top.equalTo(profileImage.snp.bottom).offset(51)
             make.leading.equalToSuperview().offset(16)
             make.trailing.equalToSuperview().offset(-39)
+//            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-10)
         }
         
     }

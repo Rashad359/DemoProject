@@ -7,13 +7,13 @@
 
 import UIKit
 import SnapKit
+import ProgressHUD
 
 final class MainViewController: BaseViewController {
     
     private let viewModel: MainViewModel
     
-    private var index: Int = 0
-    private var staleIndex: Int = 0
+    private var pageCount: Int = 1
     
     private var defaultTitle: String = ""
     
@@ -70,7 +70,7 @@ final class MainViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        viewModel.printData()
+        viewModel.printData(page: 1)
         viewModel.subscribe(self)
     }
     
@@ -147,7 +147,6 @@ final class MainViewController: BaseViewController {
                 
                 let cell: ProfileCollectionCell = collectionView.dequeueCell(for: indexPath)
                 cell.configure(item: profileData)
-                self.index = indexPath.row
                 
                 return cell
             }
@@ -403,7 +402,6 @@ extension MainViewController: UICollectionViewDelegate {
             
         case .secondSection(let profileData):
             
-            staleIndex = indexPath.row
             viewModel.goToDetails(
                 with: DetailsData(
                     name: profileData.profileName,
@@ -413,17 +411,51 @@ extension MainViewController: UICollectionViewDelegate {
                     species: profileData.profileSpecies,
                     type: profileData.type,
                     origin: profileData.origin,
-                    isBookmarked: profileData.isBookmarked,
-                    index: indexPath.row
+                    isBookmarked: profileData.isBookmarked
                 )
             )
         default:
             return
         }
     }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let frameHeight = scrollView.frame.size.height
+        
+        guard contentHeight > frameHeight else { return }
+        
+        if offsetY > contentHeight - frameHeight {
+            
+            viewModel.appendData(with: pageCount + 1)
+            pageCount += 1
+            ProgressHUD.animate("Loading...", interaction: false)
+        }
+    }
 }
 
 extension MainViewController: MainViewDelegate {
+    
+    func didUpdateData(with data: [ProfileCollectionCell.Item]) {
+        
+        var currentList = viewModel.getList()
+        
+        let newItems = data.filter { !currentList.contains($0) }
+        
+        if !newItems.isEmpty {
+            currentList.append(contentsOf: newItems)
+            viewModel.saveList(list: currentList)
+        } else {
+            print("no new items")
+            return
+        }
+        
+        profileItems = currentList
+        applySnapshot(categories: items, profiles: profileItems)
+        
+        ProgressHUD.dismiss()
+    }
     
     func bookmarked() {
         let updatedList = viewModel.getList()

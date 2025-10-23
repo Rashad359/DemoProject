@@ -16,5 +16,4 @@ struct DetailsData {
     let type: String
     let origin: String
     let isBookmarked: Bool
-    let index: Int
 }

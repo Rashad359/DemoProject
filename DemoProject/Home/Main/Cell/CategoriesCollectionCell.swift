@@ -38,7 +38,6 @@ final class CategoriesCollectionCell: UICollectionViewCell {
         super.init(frame: frame)
         
         setupUI()
-        setupContextMenu()
     }
     
     required init?(coder: NSCoder) {
@@ -66,11 +65,6 @@ final class CategoriesCollectionCell: UICollectionViewCell {
         }
     }
     
-    private func setupContextMenu() {
-        let interaction = UIContextMenuInteraction(delegate: self)
-        addInteraction(interaction)
-    }
-    
 }
 
 extension CategoriesCollectionCell {
@@ -81,23 +75,5 @@ extension CategoriesCollectionCell {
     
     func configure(item: Item) {
         titleLabel.text = item.title
-    }
-}
-
-extension CategoriesCollectionCell: UIContextMenuInteractionDelegate {
-    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            
-            let favorite = UIAction(title: "favorites", image: UIImage(systemName: "heart")) { _ in
-                print("Favorite tapped")
-            }
-            
-            let share = UIAction(title: "share", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-                print("share Tapped")
-            }
-            
-            return UIMenu(title: "", children: [favorite, share])
-        }
     }
 }

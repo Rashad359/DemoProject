@@ -166,6 +166,16 @@ final class MainViewController: BaseViewController {
         currentMenuView = containerView
     }
     
+    private func applyCategoryFilter(title: String, keyPath: KeyPath<ProfileCollectionCell.Item, String>) {
+
+        let filteredList = viewModel.profileItems.filter { $0[keyPath: keyPath] == title }
+        
+        viewModel.items[index].title = title
+        viewModel.items[index].isTapped.toggle()
+        
+        self.applySnapshot(categories: viewModel.items, profiles: filteredList)
+    }
+    
     @objc
     private func filterByCategory(_ sender: TapGestureRecognizerWithInput) {
         guard let input = sender.input,
@@ -173,82 +183,25 @@ final class MainViewController: BaseViewController {
         
         menu.removeFromSuperview()
         currentMenuView = nil
-        switch input {
-        case "Male":
+        
+        let currentCategory = viewModel.items[index]
+        
+        let filterConfig: KeyPath<ProfileCollectionCell.Item, String>
+        
+        switch currentCategory.type {
+        case .gender:
             
-            let filteredList = viewModel.profileItems.filter { $0.gender == "Male" }
+            filterConfig = \.gender
             
-            viewModel.items[index].title = input
-            viewModel.items[index].isTapped.toggle()
+        case .classification:
             
-            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
+            filterConfig = \.profileSpecies
             
-        case "Female":
-            
-            let filteredList = viewModel.profileItems.filter { $0.gender == "Female" }
-            
-            viewModel.items[index].title = input
-            viewModel.items[index].isTapped.toggle()
-            
-            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
-            
-        case "Genderless":
-            
-            let filteredList = viewModel.profileItems.filter { $0.gender == "Genderless" }
-            
-            viewModel.items[index].title = input
-            viewModel.items[index].isTapped.toggle()
-            
-            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
-            
-        case "Unknown":
-            
-            let filteredList = viewModel.profileItems.filter { $0.gender == "Unknown" }
-            
-            viewModel.items[index].title = input
-            viewModel.items[index].isTapped.toggle()
-            
-            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
-            
-        case "Human":
-            
-            let filteredList = viewModel.profileItems.filter { $0.profileSpecies == "Human" }
-            
-            viewModel.items[index].title = input
-            viewModel.items[index].isTapped.toggle()
-            
-            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
-            
-        case "Alien":
-            
-            let filteredList = viewModel.profileItems.filter { $0.profileSpecies == "Alien" }
-            
-            viewModel.items[index].title = input
-            viewModel.items[index].isTapped.toggle()
-            
-            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
-            
-        case "Alive":
-            
-            let filteredList = viewModel.profileItems.filter { $0.status == "Alive" }
-            
-            viewModel.items[index].title = input
-            viewModel.items[index].isTapped.toggle()
-            
-            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
-            
-        case "Dead":
-            
-            let filteredList = viewModel.profileItems.filter { $0.status == "Dead" }
-            
-            viewModel.items[index].title = input
-            viewModel.items[index].isTapped.toggle()
-            
-            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
-            
-        default:
-            print(input)
+        case .status:
+            filterConfig = \.status
         }
+        
+        applyCategoryFilter(title: input, keyPath: filterConfig)
     }
     
     private func createDiffableDataSource() {

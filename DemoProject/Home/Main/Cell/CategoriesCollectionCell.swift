@@ -76,14 +76,12 @@ final class CategoriesCollectionCell: UICollectionViewCell {
     @objc
     private func openMenu() {
         menuAppears?()
-//        chevronImage.image = isTapped ? UIImage(systemName: "x.circle.fill") : UIImage.chevronDown
     }
     
 }
 
 extension CategoriesCollectionCell {
     nonisolated struct Item: Hashable, Equatable {
-//        let id = UUID()
         var title: String
         var isTapped: Bool = false
         let type: CategoryType

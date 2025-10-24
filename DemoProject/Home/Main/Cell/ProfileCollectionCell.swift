@@ -148,7 +148,6 @@ final class ProfileCollectionCell: UICollectionViewCell {
 
 extension ProfileCollectionCell {
     nonisolated struct Item: Hashable, Equatable, Codable {
-//        var id = UUID()
         let profileName: String
         let profileSpecies: String
         let status: String
@@ -157,14 +156,6 @@ extension ProfileCollectionCell {
         let type: String
         let origin: String
         var isBookmarked: Bool
-        
-//        static func == (lhs: Item, rhs: Item) -> Bool {
-//            return lhs.id == rhs.id
-//        }
-//        
-//        func hash(into hasher: inout Hasher) {
-//            hasher.combine(id)
-//        }
     }
     
     func configure(item: Item) {

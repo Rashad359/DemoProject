@@ -10,6 +10,10 @@ import SnapKit
 
 final class CategoriesCollectionCell: UICollectionViewCell {
     
+    var menuAppears: (() -> ())? = nil
+    
+    private var isTapped: Bool = false
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Test Category"
@@ -50,6 +54,11 @@ final class CategoriesCollectionCell: UICollectionViewCell {
         
         layer.cornerRadius = 15
         
+        isUserInteractionEnabled = true
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(openMenu))
+        addGestureRecognizer(tap)
+        
         contentView.addSubview(mainStackView)
         
         [titleLabel, chevronImage].forEach(mainStackView.addArrangedSubview)
@@ -65,12 +74,24 @@ final class CategoriesCollectionCell: UICollectionViewCell {
         }
     }
     
+    @objc
+    private func openMenu() {
+        menuAppears?()
+    }
+    
 }
 
 extension CategoriesCollectionCell {
     nonisolated struct Item: Hashable, Equatable {
         let id = UUID()
         var title: String
+        let type: CategoryType
+    }
+    
+    enum CategoryType {
+        case gender
+        case classification
+        case status
     }
     
     func configure(item: Item) {

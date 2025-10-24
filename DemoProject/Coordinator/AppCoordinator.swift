@@ -27,6 +27,10 @@ class AppCoordinator: Coordinator {
     
     func navigateToDetails(with data: DetailsData, completion: (() -> ())?) {
         let detailsVC = DetailsBuilder(detailsData: data).build(completion: completion)
-        navigationController.pushViewController(detailsVC, animated: true)
+        
+        if let tabbar = navigationController.viewControllers.first as? UITabBarController,
+           let currentNav = tabbar.selectedViewController as? UINavigationController {
+            currentNav.pushViewController(detailsVC, animated: true)
+        }
     }
 }

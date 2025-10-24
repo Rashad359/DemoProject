@@ -7,6 +7,6 @@
 
 import UIKit
 
-class StringGestureRecognizer: UITapGestureRecognizer {
+class TapGestureRecognizerWithInput: UITapGestureRecognizer {
     var input: String?
 }

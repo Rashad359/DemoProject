@@ -38,12 +38,19 @@ final class HomeTabBarController: BaseTabBarController {
     override func setupTabs() {
         super.setupTabs()
         
-        let main = MainViewBuilder(coordinator: coordinator).build()
-        main.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
-
-        let favorites = FavoritesBuilder(coordinator: coordinator).build()
-        favorites.tabBarItem = UITabBarItem(title: "Favorites", image: UIImage(systemName: "bookmark"), tag: 1)
         
-        self.setViewControllers([main, favorites], animated: true)
+        let mainNav = self.createNav(with: "Home", and: UIImage(systemName: "house"), vc: MainViewBuilder(coordinator: coordinator).build())
+        
+        let favoritesNav = self.createNav(with: "Favorites", and: UIImage(systemName: "bookmark"), vc: FavoritesBuilder(coordinator: coordinator).build())
+        
+        self.setViewControllers([mainNav, favoritesNav], animated: true)
+        
+//        let main = MainViewBuilder(coordinator: coordinator).build()
+//        main.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
+
+//        let favorites = FavoritesBuilder(coordinator: coordinator).build()
+//        favorites.tabBarItem = UITabBarItem(title: "Favorites", image: UIImage(systemName: "bookmark"), tag: 1)
+        
+//        self.setViewControllers([main, favorites], animated: true)
     }
 }

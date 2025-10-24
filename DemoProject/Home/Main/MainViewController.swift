@@ -11,7 +11,11 @@ import ProgressHUD
 
 final class MainViewController: BaseViewController {
     
+    private var index: Int = 0
+    
     private let viewModel: MainViewModel
+    
+    private var currentMenuView: UIView?
     
     private var pageCount: Int = 1
     
@@ -33,15 +37,15 @@ final class MainViewController: BaseViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private var items: [CategoriesCollectionCell.Item] = [
-        .init(title: "Gender Types"),
-        .init(title: "Classifications"),
-        .init(title: "Status")
-    ]
-    
-    private var profileItems: [ProfileCollectionCell.Item] = []
-    
-    private var filteredResult: [ProfileCollectionCell.Item] = []
+//    private var items: [CategoriesCollectionCell.Item] = [
+//        .init(title: "Gender Types", type: .gender),
+//        .init(title: "Classifications", type: .classification),
+//        .init(title: "Status", type: .status)
+//    ]
+//    
+//    private var profileItems: [ProfileCollectionCell.Item] = []
+//    
+//    private var filteredResult: [ProfileCollectionCell.Item] = []
     
     typealias DiffableDatasource = UICollectionViewDiffableDataSource<SectionType, MyItems>
     
@@ -70,18 +74,21 @@ final class MainViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        viewModel.deleteList()
         viewModel.printData(page: 1)
         viewModel.subscribe(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        profileItems = viewModel.getList()
-        applySnapshot(categories: items, profiles: profileItems)
+        viewModel.profileItems = viewModel.getList()
+        applySnapshot(categories: viewModel.items, profiles: viewModel.profileItems)
+        navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
     override func setupUI() {
@@ -97,6 +104,143 @@ final class MainViewController: BaseViewController {
         
         createDiffableDataSource()
         
+    }
+    
+    private func contextMenu(options: [String], superView: UIView) {
+        
+        if let menu = currentMenuView {
+            menu.removeFromSuperview()
+            currentMenuView = nil
+            return
+        }
+        
+        currentMenuView?.removeFromSuperview()
+        
+        let containerView = UIView()
+        containerView.backgroundColor = .bookmarkTint
+        containerView.layer.cornerRadius = 15
+        
+        let stackView = BaseVerticalStackView()
+        stackView.spacing = 20
+        
+        let optionsStackView = BaseVerticalStackView()
+        optionsStackView.spacing = 2
+        
+        for option in options {
+            let label = UILabel()
+            label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+            label.text = option
+            label.textColor = UIColor.categoryText
+            let underline = UIView()
+            underline.translatesAutoresizingMaskIntoConstraints = false
+            underline.heightAnchor.constraint(equalToConstant: 1).isActive = true
+            underline.backgroundColor = UIColor.categoryText
+            let tapGesture = TapGestureRecognizerWithInput(target: self, action: #selector(filterByCategory))
+            tapGesture.input = option
+            label.addGestureRecognizer(tapGesture)
+            label.isUserInteractionEnabled = true
+            
+            [label, underline].forEach(optionsStackView.addArrangedSubview)
+            
+        }
+        
+        view.addSubview(containerView)
+        
+        containerView.addSubview(stackView)
+        
+        stackView.addArrangedSubview(optionsStackView)
+        
+        containerView.snp.makeConstraints { make in
+            make.top.equalTo(superView.snp.bottom).offset(10)
+            make.horizontalEdges.equalTo(superView)
+            make.height.greaterThanOrEqualTo(40)
+        }
+        
+        stackView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(13)
+            make.leading.equalToSuperview().offset(13)
+            make.bottom.equalToSuperview().offset(-13)
+            make.trailing.equalToSuperview()
+        }
+        
+        currentMenuView = containerView
+    }
+    
+    @objc
+    private func filterByCategory(_ sender: TapGestureRecognizerWithInput) {
+        guard let input = sender.input,
+              let menu = currentMenuView else { return }
+        
+        menu.removeFromSuperview()
+        currentMenuView = nil
+        switch input {
+        case "Male":
+            
+            let filteredList = viewModel.profileItems.filter { $0.gender == "Male" }
+            
+            viewModel.items[index].title = input
+            
+            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
+            
+        case "Female":
+            
+            let filteredList = viewModel.profileItems.filter { $0.gender == "Female" }
+            
+            viewModel.items[index].title = input
+            
+            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
+            
+        case "Genderless":
+            
+            let filteredList = viewModel.profileItems.filter { $0.gender == "Genderless" }
+            
+            viewModel.items[index].title = input
+            
+            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
+            
+        case "Unknown":
+            
+            let filteredList = viewModel.profileItems.filter { $0.gender == "Unknown" }
+            
+            viewModel.items[index].title = input
+            
+            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
+            
+        case "Human":
+            
+            let filteredList = viewModel.profileItems.filter { $0.profileSpecies == "Human" }
+            
+            viewModel.items[index].title = input
+            
+            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
+            
+        case "Alien":
+            
+            let filteredList = viewModel.profileItems.filter { $0.profileSpecies == "Alien" }
+            
+            viewModel.items[index].title = input
+            
+            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
+            
+        case "Alive":
+            
+            let filteredList = viewModel.profileItems.filter { $0.status == "Alive" }
+            
+            viewModel.items[index].title = input
+            
+            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
+            
+        case "Dead":
+            
+            let filteredList = viewModel.profileItems.filter { $0.status == "Dead" }
+            
+            viewModel.items[index].title = input
+            
+            self.applySnapshot(categories: viewModel.items, profiles: filteredList)
+            
+        default:
+            print(input)
+        }
     }
     
     private func createDiffableDataSource() {
@@ -116,22 +260,22 @@ final class MainViewController: BaseViewController {
                 cell.searchComplete = { text in
                     
                     guard let searchText = text?.trimmingCharacters(in: .whitespaces),
-                          !searchText.isEmpty else { self.applySnapshot(categories: self.items, profiles: self.profileItems); return }
+                          !searchText.isEmpty else { self.applySnapshot(categories: self.viewModel.items, profiles: self.viewModel.profileItems); return }
                     
-                    self.filteredResult = self.profileItems.filter { $0.profileName.localizedStandardContains(searchText.lowercased())}
+                    self.viewModel.filteredResult = self.viewModel.profileItems.filter { $0.profileName.localizedStandardContains(searchText.lowercased())}
             
                     if searchText.isEmpty {
-                        self.filteredResult = self.profileItems
+                        self.viewModel.filteredResult = self.viewModel.profileItems
                     } else {
-                        self.filteredResult = self.profileItems.filter { $0.profileName.localizedStandardContains(searchText.lowercased())}
+                        self.viewModel.filteredResult = self.viewModel.profileItems.filter { $0.profileName.localizedStandardContains(searchText.lowercased())}
                     }
             
-                    self.applySnapshot(categories: self.items, profiles: self.filteredResult)
+                    self.applySnapshot(categories: self.viewModel.items, profiles: self.viewModel.filteredResult)
                 }
                 
                 cell.beginSearch = { searchText in
                     guard let text = searchText,
-                          !text.isEmpty else { self.applySnapshot(categories: self.items, profiles: self.profileItems); return }
+                          !text.isEmpty else { self.applySnapshot(categories: self.viewModel.items, profiles: self.viewModel.profileItems); return }
                 }
                 
                 return cell
@@ -139,7 +283,52 @@ final class MainViewController: BaseViewController {
             case .firstSection(let categoryData):
                 
                 let cell: CategoriesCollectionCell = collectionView.dequeueCell(for: indexPath)
+                let currentIndex = indexPath.row
                 cell.configure(item: categoryData)
+                cell.menuAppears = {
+                    
+                    
+                    self.index = currentIndex
+                    let currentCategory = self.viewModel.items[currentIndex]
+                    
+                    if currentCategory.title != "Gender Types" &&
+                        currentCategory.title != "Classifications" &&
+                        currentCategory.title != "Status" {
+                        
+                        var updatedCategory = currentCategory
+                        switch currentCategory.title {
+                        case "Male", "Female", "Genderless", "Unknown":
+                            updatedCategory.title = "Gender Types"
+                        case "Human", "Alien":
+                            updatedCategory.title = "Classifications"
+                        case "Alive", "Dead":
+                            updatedCategory.title = "Status"
+                        default:
+                            break
+                        }
+                        
+                        self.viewModel.items[currentIndex] = updatedCategory
+                        
+                        self.applySnapshot(categories: self.viewModel.items, profiles: self.viewModel.profileItems)
+                        return
+                    }
+                    
+                    switch categoryData.type {
+                    case .gender:
+                        
+                        self.contextMenu(options: ["Male", "Female", "Genderless", "Unknown"], superView: cell.contentView)
+                        
+                    case .classification:
+                        
+                        self.contextMenu(options: ["Human", "Alien"], superView: cell.contentView)
+                        
+                    case .status:
+                        
+                        self.contextMenu(options: ["Alive", "Dead"], superView: cell.contentView)
+                        
+                    }
+                    
+                }
                 
                 return cell
                 
@@ -230,148 +419,6 @@ final class MainViewController: BaseViewController {
         }
     }
     
-    private func showMenu(for category: CategoriesCollectionCell.Item, at indexPath: IndexPath) {
-        
-        let alert = UIAlertController(title: category.title, message: nil, preferredStyle: .actionSheet)
-        
-        switch category.title {
-        case "Gender Types":
-            
-            let male = UIAlertAction(title: "Male", style: .default) { _ in
-                var updatedCategory = category
-                self.defaultTitle = updatedCategory.title
-                updatedCategory.title = "Male"
-                self.items[indexPath.row] = updatedCategory
-                
-                let updatedProfile = self.profileItems.filter { $0.gender == "Male" }
-                
-                self.applySnapshot(categories: self.items, profiles: updatedProfile)
-            }
-            
-            let female = UIAlertAction(title: "Female", style: .default) { _ in
-                var updatedCategory = category
-                self.defaultTitle = updatedCategory.title
-                updatedCategory.title = "Female"
-                self.items[indexPath.row] = updatedCategory
-                
-                let updatedProfile = self.profileItems.filter { $0.gender == "Female" }
-                
-                self.applySnapshot(categories: self.items, profiles: updatedProfile)
-            }
-            
-            let genderless = UIAlertAction(title: "Genderless", style: .default) { _ in
-                var updatedCategory = category
-                self.defaultTitle = updatedCategory.title
-                updatedCategory.title = "Genderless"
-                self.items[indexPath.row] = updatedCategory
-                
-                let updatedProfile = self.profileItems.filter { $0.gender == "Genderless" }
-                
-                self.applySnapshot(categories: self.items, profiles: updatedProfile)
-            }
-            
-            let unknown = UIAlertAction(title: "Unknown", style: .default) { _ in
-                var updatedCategory = category
-                self.defaultTitle = updatedCategory.title
-                updatedCategory.title = "Unknown"
-                self.items[indexPath.row] = updatedCategory
-                
-                let updatedProfile = self.profileItems.filter { $0.gender == "Unknown" }
-                
-                self.applySnapshot(categories: self.items, profiles: updatedProfile)
-            }
-            
-            [male, female, genderless, unknown].forEach(alert.addAction)
-            
-        case "Classifications":
-            
-            let human = UIAlertAction(title: "Human", style: .default) { _ in
-                var updatedCategory = category
-                self.defaultTitle = updatedCategory.title
-                updatedCategory.title = "Human"
-                self.items[indexPath.row] = updatedCategory
-                
-                let updatedProfile = self.profileItems.filter { $0.profileSpecies == "Human" }
-                
-                self.applySnapshot(categories: self.items, profiles: updatedProfile)
-            }
-            
-            let alien = UIAlertAction(title: "Alien", style: .default) { _ in
-                var updatedCategory = category
-                self.defaultTitle = updatedCategory.title
-                updatedCategory.title = "Alien"
-                self.items[indexPath.row] = updatedCategory
-                
-                let updatedProfile = self.profileItems.filter { $0.profileSpecies == "Alien" }
-                
-                self.applySnapshot(categories: self.items, profiles: updatedProfile)
-            }
-            
-            [human, alien].forEach(alert.addAction)
-            
-        case "Status":
-            
-            let alive = UIAlertAction(title: "Alive", style: .default) { _ in
-                var updatedCategory = category
-                self.defaultTitle = updatedCategory.title
-                updatedCategory.title = "Alive"
-                self.items[indexPath.row] = updatedCategory
-                
-                let updatedProfile = self.profileItems.filter { $0.status == "Alive" }
-                
-                self.applySnapshot(categories: self.items, profiles: updatedProfile)
-            }
-            
-            let dead = UIAlertAction(title: "Dead", style: .default) { _ in
-                var updatedCategory = category
-                self.defaultTitle = updatedCategory.title
-                updatedCategory.title = "Dead"
-                self.items[indexPath.row] = updatedCategory
-                
-                let updatedProfile = self.profileItems.filter { $0.status == "Dead" }
-                
-                self.applySnapshot(categories: self.items, profiles: updatedProfile)
-            }
-            
-            let unknown = UIAlertAction(title: "Unknown", style: .default) { _ in
-                var updatedCategory = category
-                self.defaultTitle = updatedCategory.title
-                updatedCategory.title = "unknown"
-                self.items[indexPath.row] = updatedCategory
-                
-                let updatedProfile = self.profileItems.filter { $0.status == "unknown" }
-                
-                self.applySnapshot(categories: self.items, profiles: updatedProfile)
-            }
-            
-            [alive, dead, unknown].forEach(alert.addAction)
-            
-        default:
-            
-            let cancel = UIAlertAction(title: "Cancel", style: .default) { _ in
-                var updatedCategory = category
-                updatedCategory.title = self.defaultTitle
-                self.items[indexPath.row] = updatedCategory
-                
-                self.applySnapshot(categories: self.items, profiles: self.profileItems)
-            }
-            
-            [cancel].forEach(alert.addAction)
-            
-        }
-        
-        
-        if let cell = collectionView.cellForItem(at: indexPath),
-           let popover = alert.popoverPresentationController {
-            popover.sourceView = cell
-            popover.sourceRect = cell.bounds
-        }
-        
-        present(alert, animated: true)
-    }
-    
-    
-    
 }
 
 nonisolated enum SectionType: Sendable, Hashable {
@@ -396,9 +443,9 @@ extension MainViewController: UICollectionViewDelegate {
         guard let item = diffableDataSource?.itemIdentifier(for: indexPath) else { return }
         
         switch item {
-        case .firstSection(let category):
+        case .firstSection(_):
             
-            showMenu(for: category, at: indexPath)
+            return
             
         case .secondSection(let profileData):
             
@@ -451,29 +498,29 @@ extension MainViewController: MainViewDelegate {
             return
         }
         
-        profileItems = currentList
-        applySnapshot(categories: items, profiles: profileItems)
+        viewModel.profileItems = currentList
+        applySnapshot(categories: viewModel.items, profiles: viewModel.profileItems)
         
         ProgressHUD.dismiss()
     }
     
     func bookmarked() {
         let updatedList = viewModel.getList()
-        profileItems = updatedList
+        viewModel.profileItems = updatedList
         
-        applySnapshot(categories: items, profiles: profileItems)
+        applySnapshot(categories: viewModel.items, profiles: viewModel.profileItems)
     }
     
     func didFetchData(with data: [ProfileCollectionCell.Item]) {
         
-        profileItems = data
+        viewModel.profileItems = data
         if viewModel.getList().isEmpty {
-            viewModel.saveList(list: profileItems)
+            viewModel.saveList(list: viewModel.profileItems)
         } else {
             print("List already exists")
-            profileItems = viewModel.getList()
+            viewModel.profileItems = viewModel.getList()
         }
-        applySnapshot(categories: items, profiles: profileItems)
+        applySnapshot(categories: viewModel.items, profiles: viewModel.profileItems)
     }
     
     func error(_ error: any Error) {
@@ -489,18 +536,19 @@ extension MainViewController: UISearchResultsUpdating {
         
         guard let searchText = searchController.searchBar.text,
               !searchText.isEmpty else {
-            applySnapshot(categories: items, profiles: profileItems)
+            applySnapshot(categories: viewModel.items, profiles: viewModel.profileItems)
             return
         }
-                filteredResult = self.profileItems.filter { $0.profileName.localizedStandardContains(searchText.lowercased())}
+        
+        viewModel.filteredResult = self.viewModel.profileItems.filter { $0.profileName.localizedStandardContains(searchText.lowercased())}
         
                 if searchText.isEmpty {
-                    filteredResult = self.profileItems
+                    viewModel.filteredResult = self.viewModel.profileItems
                 } else {
-                    filteredResult = self.profileItems.filter { $0.profileName.localizedStandardContains(searchText.lowercased())}
+                    viewModel.filteredResult = self.viewModel.profileItems.filter { $0.profileName.localizedStandardContains(searchText.lowercased())}
                 }
         
-                applySnapshot(categories: items, profiles: filteredResult)
+        applySnapshot(categories: viewModel.items, profiles: viewModel.filteredResult)
     }
     
     

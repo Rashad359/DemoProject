@@ -188,6 +188,14 @@ final class DetailsViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        list = viewModel.getState()
+        
+        list.forEach { item in
+            if item.profileName == detailsData.name {
+                navigationItem.rightBarButtonItem?.image = item.isBookmarked ? .bookmarkFill : .bookmark
+            }
+        }
+        
     }
     
     override func setupUI() {

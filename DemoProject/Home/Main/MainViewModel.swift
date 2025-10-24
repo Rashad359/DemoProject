@@ -15,6 +15,17 @@ protocol MainViewDelegate: AnyObject {
 }
 
 final class MainViewModel {
+    
+    var items: [CategoriesCollectionCell.Item] = [
+        .init(title: "Gender Types", type: .gender),
+        .init(title: "Classifications", type: .classification),
+        .init(title: "Status", type: .status)
+    ]
+    
+    var profileItems: [ProfileCollectionCell.Item] = []
+    
+    var filteredResult: [ProfileCollectionCell.Item] = []
+    
     private let networkManager = DependencyContainer.shared.networkManager
     
     private let userdefaults = DependencyContainer.shared.userDefaultsManager

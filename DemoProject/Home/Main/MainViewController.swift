@@ -179,6 +179,7 @@ final class MainViewController: BaseViewController {
             let filteredList = viewModel.profileItems.filter { $0.gender == "Male" }
             
             viewModel.items[index].title = input
+            viewModel.items[index].isTapped.toggle()
             
             self.applySnapshot(categories: viewModel.items, profiles: filteredList)
             
@@ -187,6 +188,7 @@ final class MainViewController: BaseViewController {
             let filteredList = viewModel.profileItems.filter { $0.gender == "Female" }
             
             viewModel.items[index].title = input
+            viewModel.items[index].isTapped.toggle()
             
             self.applySnapshot(categories: viewModel.items, profiles: filteredList)
             
@@ -195,6 +197,7 @@ final class MainViewController: BaseViewController {
             let filteredList = viewModel.profileItems.filter { $0.gender == "Genderless" }
             
             viewModel.items[index].title = input
+            viewModel.items[index].isTapped.toggle()
             
             self.applySnapshot(categories: viewModel.items, profiles: filteredList)
             
@@ -203,6 +206,7 @@ final class MainViewController: BaseViewController {
             let filteredList = viewModel.profileItems.filter { $0.gender == "Unknown" }
             
             viewModel.items[index].title = input
+            viewModel.items[index].isTapped.toggle()
             
             self.applySnapshot(categories: viewModel.items, profiles: filteredList)
             
@@ -211,6 +215,7 @@ final class MainViewController: BaseViewController {
             let filteredList = viewModel.profileItems.filter { $0.profileSpecies == "Human" }
             
             viewModel.items[index].title = input
+            viewModel.items[index].isTapped.toggle()
             
             self.applySnapshot(categories: viewModel.items, profiles: filteredList)
             
@@ -219,6 +224,7 @@ final class MainViewController: BaseViewController {
             let filteredList = viewModel.profileItems.filter { $0.profileSpecies == "Alien" }
             
             viewModel.items[index].title = input
+            viewModel.items[index].isTapped.toggle()
             
             self.applySnapshot(categories: viewModel.items, profiles: filteredList)
             
@@ -227,6 +233,7 @@ final class MainViewController: BaseViewController {
             let filteredList = viewModel.profileItems.filter { $0.status == "Alive" }
             
             viewModel.items[index].title = input
+            viewModel.items[index].isTapped.toggle()
             
             self.applySnapshot(categories: viewModel.items, profiles: filteredList)
             
@@ -235,6 +242,7 @@ final class MainViewController: BaseViewController {
             let filteredList = viewModel.profileItems.filter { $0.status == "Dead" }
             
             viewModel.items[index].title = input
+            viewModel.items[index].isTapped.toggle()
             
             self.applySnapshot(categories: viewModel.items, profiles: filteredList)
             
@@ -306,6 +314,8 @@ final class MainViewController: BaseViewController {
                         default:
                             break
                         }
+                        
+                        updatedCategory.isTapped = false
                         
                         self.viewModel.items[currentIndex] = updatedCategory
                         

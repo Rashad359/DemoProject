@@ -12,8 +12,6 @@ final class CategoriesCollectionCell: UICollectionViewCell {
     
     var menuAppears: (() -> ())? = nil
     
-    private var isTapped: Bool = false
-    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Test Category"
@@ -27,6 +25,7 @@ final class CategoriesCollectionCell: UICollectionViewCell {
         let image = UIImageView()
         image.image = UIImage.chevronDown
         image.tintColor = .categoryText
+        image.contentMode = .scaleAspectFit
         
         return image
     }()
@@ -77,14 +76,16 @@ final class CategoriesCollectionCell: UICollectionViewCell {
     @objc
     private func openMenu() {
         menuAppears?()
+//        chevronImage.image = isTapped ? UIImage(systemName: "x.circle.fill") : UIImage.chevronDown
     }
     
 }
 
 extension CategoriesCollectionCell {
     nonisolated struct Item: Hashable, Equatable {
-        let id = UUID()
+//        let id = UUID()
         var title: String
+        var isTapped: Bool = false
         let type: CategoryType
     }
     
@@ -96,5 +97,6 @@ extension CategoriesCollectionCell {
     
     func configure(item: Item) {
         titleLabel.text = item.title
+        chevronImage.image = item.isTapped ? .close : UIImage.chevronDown
     }
 }
